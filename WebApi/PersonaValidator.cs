@@ -7,7 +7,7 @@ namespace WebApi
     {
         public PersonaValidator() 
         {
-            RuleFor(x => x._Id).Null();
+            //RuleFor(x => x._Id).Null();
             RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Nombre).NotNull();
             RuleFor(x => x.Apellido).NotNull();

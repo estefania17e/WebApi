@@ -8,24 +8,24 @@ using System.Configuration;
 using Microsoft.Extensions.Options;
 using WebApi.Services;
 using WebApi.Controllers;
+using WebApi.Models;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
 
-//builder.Services.AddControllers()
-          //      .AddFluentValidation(c => c.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.Configure<PersonaSettings>(builder.Configuration.GetSection("PersonaSettings").Get<PersonaSettings>();));
-//builder.Configuration.GetSection("PersonaSettings").Get<PersonaSettings>();
-builder.Services.Configure<PersonaSettings>(builder.Configuration.GetSection("PersonaSettings"));
-builder.Services.AddSingleton<PersonaSettings>
-    (d => d.GetRequiredService<IOptions<PersonaSettings>>().Value);
+builder.Services.Configure<PersonaDatabaseSettings>(
+    builder.Configuration.GetSection("PersonaDatabase"));
+builder.Services.AddSingleton<PersonaDatabaseSettings>();
+builder.Services.AddSingleton<PersonaDatabaseSettings>
+    (d => d.GetRequiredService<IOptions<PersonaDatabaseSettings>>().Value);
 builder.Services.AddControllers()
     .AddJsonOptions(
     options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<PersonaService>();
+builder.Services.AddTransient<PersonaService>();
+builder.Services.AddScoped<PersonaService>(); 
 
 builder.Services.AddSwaggerGen();
 

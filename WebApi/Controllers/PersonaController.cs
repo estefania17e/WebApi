@@ -4,82 +4,86 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
-    
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class PersonaController : ControllerBase
     {
-        public PersonaService _personaService;
+        private readonly PersonaService _personaService;
 
         public PersonaController(PersonaService personsaservice)
         {
             _personaService = personsaservice;
         }
         [HttpGet]
-        public ActionResult<List<Persona>> Get()
+        public async Task<List<Persona>> Get() => await _personaService.GetAsync();
+       
+        [HttpGet("{id:length(24)}")]
+        public async Task<ActionResult<Persona>> Get(string id)
         {
-            return _personaService.Get();
-        }
-        /*
-        [HttpPost(Name = "Persona")]
-        [Route("New")]
-        public dynamic CreatePersona()
-        {
-            List<Persona> personas = new List<Persona>
+            var person = await _personaService.GetAsync(id);
+
+            if (person is null)
             {
-                
-                new Persona
-                {
-                    Id = 3,
-                    Nombre = "Mirai",
-                    Apellido = "Vargas",
-                    Edad = 2,
-                    Empleo = {"No empleo"} ,
-                    DepFab = ""
-                }
-            };
-            return personas;
+                return NotFound();
+            }
+
+            return person;
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Persona>> Get(int id)
+        {
+            var person = await _personaService.GetAsync(id);
+
+            if (person is null)
+            {
+                return NotFound();
+            }
+
+            return person;
+        }
+
+
         [HttpPost]
-        [Route("crearNew")]
-        public dynamic Edit()
+        public async Task<ActionResult<Persona>> Post(Persona newPersona)
         {
-            List<Persona> personas = new List<Persona>
+
+            await _personaService.CreateAsync(newPersona);
+
+            return CreatedAtAction(nameof(Get), new { id = newPersona._Id }, newPersona);
+        }
+        [HttpPut("{id:length(24)}")]
+        public async Task<ActionResult<Persona>> Update(string id, Persona NewPerson)
+        {
+
+            var person = await _personaService.GetAsync(id);
+
+            if (person is null)
             {
+                return NotFound();
+            }
+            NewPerson._Id = person._Id;
 
-                new Persona
-                {
-                    Id = 2,
-                    Nombre = "Mirai",
-                    Apellido = "Vargas",
-                    Edad = 2,
-                    Empleo = {"Desarrollador","soporte"},
-                    DepFab = ""
-                }
-            };
-            return personas;
+            await _personaService.UpdateAsync(id, person);
+
+            return NoContent();
+
+            return person;
         }
-        
-        [HttpGet]
-        [Route("listar")]
-        public dynamic ReadPersona()
+
+        [HttpDelete("{id:length(24)}")]
+        public async Task<IActionResult> Delete(string id)
         {
+            var person = await _personaService.GetAsync(id);
 
+            if (person is null)
+            {
+                return NotFound();
+            }
+
+            await _personaService.RemoveAsync(id);
+
+            return NoContent();
         }
-        [HttpGet]
-        [Route("cliente")]
-        public dynamic UpdatePersona()
-        {
-
-        }
-        [HttpGet]
-        [Route("cliente")]
-        public dynamic DeletePersona()
-        {
-
-        }
-        */
-
-
     }
-}
+}    
